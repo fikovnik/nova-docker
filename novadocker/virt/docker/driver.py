@@ -385,9 +385,17 @@ class DockerDriver(driver.ComputeDriver):
             'network_disabled': True,
         }
 
-        image = self.docker.inspect_image(self._encode_utf8(image_name))
-        if not image:
-            image = self._pull_missing_image(context, image_meta, instance)
+        try:
+            image = self.docker.inspect_image(self._encode_utf8(image_name))
+        except errors.APIError as e:
+            # HTTP 404 will be thrown by the inspect image if there is no such
+            # image in the local docker image registry
+            if e.response.status_code == 404:
+                image = self._pull_missing_image(context, image_meta, instance)
+            else:
+                # any other problem is re-thrown
+                raise e
+
         if not (image and image['ContainerConfig']['Cmd']):
             args['command'] = ['sh']
         # Glance command-line overrides any set in the Docker image
