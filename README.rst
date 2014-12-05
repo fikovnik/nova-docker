@@ -70,6 +70,7 @@ Notes
 
 * Earlier releases of this driver required the deployment of a private docker registry. This is no longer required. Images are now saved and loaded from Glance.
 * Images loaded from Glance may do bad things. Only allow administrators to add images. Users may create snapshots of their containers, generating images in Glance -- these images are managed and thus safe.
+* The only firewall driver that is supported is ``nova.virt.firewall.NoopFirewallDriver``. Make sure that the ``nova.conf`` does not define any other as that one will take a priority.
 
 ----------
 Contact Us
